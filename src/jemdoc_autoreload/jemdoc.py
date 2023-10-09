@@ -1572,14 +1572,16 @@ def procfile(f):
     # jem: XXX this is where you would intervene to do a fast open/close.
     f.outf.close()
 
-def main():
-  if len(sys.argv) == 1 or sys.argv[1] in ('--help', '-h'):
+def main(argv=None):
+  if argv is None:
+    argv = sys.argv
+  if len(argv) == 1 or argv[1] in ('--help', '-h'):
     showhelp()
     raise SystemExit
-  if sys.argv[1] == '--show-config':
+  if argv[1] == '--show-config':
     print(standardconf())
     raise SystemExit
-  if sys.argv[1] == '--version':
+  if argv[1] == '--version':
     info()
     raise SystemExit
 
@@ -1587,29 +1589,29 @@ def main():
   confoverride = False
   outname = None
   confnames = []
-  for i in range(1, len(sys.argv), 2):
-    if sys.argv[i] == '-o':
+  for i in range(1, len(argv), 2):
+    if argv[i] == '-o':
       if outoverride:
         raise RuntimeError("only one output file / directory, please")
-      outname = sys.argv[i+1]
+      outname = argv[i+1]
       outoverride = True
-    elif sys.argv[i] == '-c':
+    elif argv[i] == '-c':
       if confoverride:
         raise RuntimeError("only one config file, please")
-      confnames.append(sys.argv[i+1])
+      confnames.append(argv[i+1])
       confoverride = True
-    elif sys.argv[i].startswith('-'):
-      raise RuntimeError('unrecognised argument %s, try --help' % sys.argv[i])
+    elif argv[i].startswith('-'):
+      raise RuntimeError('unrecognised argument %s, try --help' % argv[i])
     else:
       break
 
   conf = parseconf(confnames)
 
   innames = []
-  for j in range(i, len(sys.argv)):
+  for j in range(i, len(argv)):
     # First, if not a file and no dot, try opening .jemdoc. Otherwise, fall back
     # to just doing exactly as asked.
-    inname = sys.argv[j]
+    inname = argv[j]
     if not os.path.isfile(inname) and '.' not in inname:
       inname += '.jemdoc'
 
