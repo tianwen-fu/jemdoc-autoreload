@@ -1,0 +1,20 @@
+[project]
+name = "jemdoc-autoreload"
+version = "0.1.0"
+description = "A simple jemdoc autoreload server"
+requires-python = ">=3.9"
+authors = [
+    {name = "Tianwen Fu", email = "tianwenf@cs.cmu.edu"}
+]
+dependencies = [ 
+  "watchdog ~= 3.0.0",
+  "importlib_resources ~= 6.1.0"
+]
+
+[build-system]
+requires = ["setuptools >= 62.3.2", "setuptools-scm", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+packages = ["jemdoc_autoreload", "jemdoc_autoreload_assets"]
+package-dir = {jemdoc_autoreload = "src/jemdoc_autoreload", jemdoc_autoreload_assets = "assets" }

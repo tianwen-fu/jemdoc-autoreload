@@ -10,3 +10,7 @@ MANIFEST
 jo
 *.html
 stage/
+.venv
+.vscode
+*.egg-info
+__pycache__
