@@ -1629,6 +1629,9 @@ def main():
 
     infile = io.open(inname, 'rb')
     outfile = io.open(thisout, 'w')
+    
+    # change working dir to that of input file.
+    os.chdir(os.path.dirname(os.path.abspath(inname)))
 
 #    print(infile.read())
     f = controlstruct(infile, outfile, conf, inname)
