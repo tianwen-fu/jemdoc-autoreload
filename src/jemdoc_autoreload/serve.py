@@ -1,6 +1,11 @@
-from jemdoc_autoreload.commands import Command
-from pathlib import Path
+import shutil
 import subprocess as sp
+from functools import partial
+from http.server import HTTPServer, SimpleHTTPRequestHandler
+from pathlib import Path
+from threading import Thread
+
+from jemdoc_autoreload.commands import Command
 from jemdoc_autoreload.jemdoc import main as compile_jemdoc
 
 
@@ -35,10 +40,16 @@ def compile(root_path, files_to_compile=None, clear_html=True):
         ]
         compile_jemdoc(jemdoc_args)
 
+    # copy static files
+    for file in static_path.rglob("*"):
+        if file.is_file():
+            shutil.copyfile(file, html_path / file.relative_to(static_path))
+
 
 class ServeCommand(Command):
     def add_arguments(self, parser):
         parser.add_argument("path", metavar="PATH", help="path to the project folder")
+        parser.add_argument("--port", type=int, default=8000, help="port to serve on")
 
     def run(self, args):
         root_path = Path(args.path).resolve()
@@ -46,4 +57,17 @@ class ServeCommand(Command):
         print("Compiling")
         compile(root_path)
 
-        # then, ask watchdog to recompile when files change
+        # serve
+        print("Serving")
+        server_address = ("", args.port)
+        httpd = HTTPServer(
+            server_address,
+            partial(SimpleHTTPRequestHandler, directory=root_path / "html"),
+        )
+        httpd_thread = Thread(target=httpd.serve_forever)
+        try:
+            httpd_thread.start()
+            command = input("Press enter to stop the server\n")
+        finally:
+            httpd.shutdown()
+            httpd_thread.join()
